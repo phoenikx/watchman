@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import requests
 from rich.console import Console
@@ -47,7 +47,7 @@ class IPOWatcher:
             max_price = company["max_price"]
             min_bid_qty = company['min_bid_quantity']
             funds_reqd = max_price * min_bid_qty
-            time_left = bidding_end_date - datetime.now()
+            time_left = bidding_end_date + timedelta(hours=12) - datetime.now()
             colour = "grey"
             if time_left.total_seconds() > 0:
                 colour = "green"
