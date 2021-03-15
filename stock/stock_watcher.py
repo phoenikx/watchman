@@ -29,7 +29,7 @@ class StockWatcher:
         return price_dict
 
     def get_stock_details(self, company_name: str):
-        profit_and_loss = {}
+        stock_details = {}
         stock_metadata = self._get_stock_metadata(company_name)
         if stock_metadata is None:
             return None, None
@@ -37,38 +37,64 @@ class StockWatcher:
         response = requests.get(self.STOCK_DETAILS_API + stock_url)
         bs4 = BeautifulSoup(response.content, "html.parser")
         profit_loss_section = bs4.find("section", {"id": "profit-loss"})
+
+        ratio_section = bs4.find("div", {"id": "top"})
+        ratio_list = ratio_section.find("ul", {"id": "top-ratios"}).findAll("li")
+        for ratio in ratio_list:
+            name = ''.join(ratio.find("span", {"class": "name"}).text.split())
+            value = ''.join('/'.join([x.text for x in ratio.findAll('span', {"class": "number"})]).split())
+            stock_details[name] = value
         tables = profit_loss_section.findAll("table", {"class": "ranges-table"})
 
-        profit_and_loss["compounded_sales_growth"] = self._process(tables[0])
-        profit_and_loss["compounded_profit_growth"] = self._process(tables[1])
-        profit_and_loss["stock_price_cagr"] = self._process(tables[2])
-        profit_and_loss["return_on_equity"] = self._process(tables[3])
-        return stock_metadata['name'], profit_and_loss
+        stock_details["Compounded Sales Growth"] = self._process(tables[0])
+        stock_details["Compounded Profit Growth"] = self._process(tables[1])
+        stock_details["Stock Price CAGR"] = self._process(tables[2])
+        stock_details["Return on Equity"] = self._process(tables[3])
+        return stock_metadata['name'], stock_details
 
     def _format_key(self, colour, key):
         return "[{}]{}[/]".format(colour, key)
 
-    def __format_value(self, value_dict: dict):
-        return "\n".join("{}  [#ffee00]{}[/]".format(k, v) for k, v in value_dict.items())
+    def __format_value(self, value):
+        if type(value) == dict:
+            return "\n".join("{}  [#ffee00]{}[/]".format(k, v) for k, v in value.items())
+        else:
+            return str(value)
 
-    def _get_table(self, company_data: dict):
+    def _get_table(self, company_data_dict: dict):
         table = Table(header_style="bold #00e5ff", box=box.SQUARE, show_lines=True)
-        table.add_column("Name", style="bold #ffee00")
-        table.add_column("Sales Growth", justify="right")
-        table.add_column("Profit Growth", justify="right")
-        table.add_column("Stock Price CAGR", justify="right")
-        table.add_column("Return on Equity", justify="right")
-        for company_name, company_data in company_data.items():
-            if company_data is None:
-                continue
-            table.add_row(*[self._format_key("grey", company_name),
-                            self._format_key("grey", self.__format_value(company_data['compounded_sales_growth'])),
-                            self._format_key("grey", self.__format_value(company_data['compounded_profit_growth'])),
-                            self._format_key("grey", self.__format_value(company_data['stock_price_cagr'])),
-                            self._format_key("grey", self.__format_value(company_data['return_on_equity']))])
+        if len(company_data_dict) <= 0:
+            return None
+        table.add_column("Name", style="bold #ff66ff")
+        table.add_column("Market Cap", style="bold #ffee00")
+        table.add_column("Current Price", style="bold #ffee00")
+        table.add_column("High/Low", style="bold #ffee00")
+        table.add_column("P/E Ratio", style="bold #ffee00")
+        table.add_column("ROCE", style="bold #ffee00")
+        table.add_column("Compounded Sales Growth")
+        table.add_column("Compounded Profit Growth")
+        table.add_column("Stock Price CAGR")
+        table.add_column("Return on Equity")
+
+        for company_name, company_data in company_data_dict.items():
+            table.add_row(company_name,
+                          company_data['MarketCap'],
+                          company_data['CurrentPrice'],
+                          company_data['High/Low'],
+                          company_data['StockP/E'],
+                          company_data['ROCE'],
+                          self.__format_value(company_data['Compounded Sales Growth']),
+                          self.__format_value(company_data['Compounded Profit Growth']),
+                          self.__format_value(company_data['Stock Price CAGR']),
+                          self.__format_value(company_data['Return on Equity']))
+
         return table
 
     def print(self, companies_data_dict: dict):
+        table = self._get_table(companies_data_dict)
+        if table is None:
+            self.console.print("No data found.")
+            return
         self.console.print(self._get_table(companies_data_dict))
 
 
