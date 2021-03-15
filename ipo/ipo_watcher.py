@@ -1,8 +1,6 @@
-import json
 import os
 from datetime import datetime
 
-import pyfiglet
 import requests
 from rich.console import Console
 from rich.table import Table
@@ -20,6 +18,8 @@ class IPOWatcher:
 
     def _get_open_listings(self):
         cookie = os.environ[self.COOKIE_KEY]
+        if cookie is None:
+            raise ValueError("Cookie not set in environment, please try again with a valid cookie.")
 
         return requests.get(self.url, headers={'cookie': cookie}).json()
 
@@ -27,8 +27,8 @@ class IPOWatcher:
         return f'[{colour}] {str(string)} [/]'
 
     def _print_formatted_output(self, ipo_data):
-        table = Table(show_header=True, header_style="bold cyan")
-        table.add_column("Company", style="dim")
+        table = Table(show_header=True, header_style="bold cyan", show_lines=True)
+        table.add_column("Company")
         table.add_column("Subscription starts")
         table.add_column("Subscription ends")
         table.add_column("Listing date")
@@ -36,7 +36,6 @@ class IPOWatcher:
         table.add_column("Max price")
         table.add_column("Min. Qty")
         table.add_column("Funds Required")
-        table.add_column("GMP")
         table.add_column('Time left')
 
         for company in ipo_data['data']['result']:
@@ -67,13 +66,11 @@ class IPOWatcher:
         self.console.print(table)
 
     def print_open_listings(self):
-        pyfiglet.print_figlet("IPO WATCHER", colors="CYAN")
         open_listings = self._get_open_listings()
         self._print_formatted_output(open_listings)
 
 
 if __name__ == '__main__':
-    ascii_banner = pyfiglet.figlet_format("IPO Watcher")
     ipo_watcher = IPOWatcher()
     gmp_fetcher = GMPFetcher()
     gmp_data = gmp_fetcher.get_gmp_data()

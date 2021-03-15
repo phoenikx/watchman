@@ -14,6 +14,9 @@ class GMPFetcher:
     def _get_value(self, td):
         return td.find('span').text
 
+    def _apply_colour(self, colour, string):
+        return f'[{colour}] {str(string)} [/]'
+
     def get_gmp_data(self):
         web_page = requests.get(self.url)
         soup = BeautifulSoup(web_page.content, "html.parser")
@@ -28,8 +31,8 @@ class GMPFetcher:
         return company_wise_gmp
 
     def print_gmp(self, gmp_data: dict):
-        table = Table(show_header=True, header_style="bold cyan")
-        table.add_column("Company Name", style="dim")
+        table = Table(show_header=True, header_style="bold cyan", show_lines=True)
+        table.add_column("Company Name")
         table.add_column("Grey Market Premium")
 
         for company_name, gmp in gmp_data.items():

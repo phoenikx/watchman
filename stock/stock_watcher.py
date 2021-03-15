@@ -32,7 +32,7 @@ class StockWatcher:
         profit_and_loss = {}
         stock_metadata = self._get_stock_metadata(company_name)
         if stock_metadata is None:
-            return None
+            return None, None
         stock_url = stock_metadata["url"]
         response = requests.get(self.STOCK_DETAILS_API + stock_url)
         bs4 = BeautifulSoup(response.content, "html.parser")
@@ -49,15 +49,15 @@ class StockWatcher:
         return "[{}]{}[/]".format(colour, key)
 
     def __format_value(self, value_dict: dict):
-        return "\n".join("{}  [yellow]{}[/]".format(k, v) for k, v in value_dict.items())
+        return "\n".join("{}  [#ffee00]{}[/]".format(k, v) for k, v in value_dict.items())
 
     def _get_table(self, company_data: dict):
-        table = Table(header_style="bold cyan", box=box.SQUARE, show_lines=True)
-        table.add_column("Name")
-        table.add_column("Compounded Sales Growth")
-        table.add_column("Compounded Profit Growth")
-        table.add_column("Stock Price CAGR")
-        table.add_column("Return on Equity")
+        table = Table(header_style="bold #00e5ff", box=box.SQUARE, show_lines=True)
+        table.add_column("Name", style="bold #ffee00")
+        table.add_column("Sales Growth", justify="right")
+        table.add_column("Profit Growth", justify="right")
+        table.add_column("Stock Price CAGR", justify="right")
+        table.add_column("Return on Equity", justify="right")
         for company_name, company_data in company_data.items():
             if company_data is None:
                 continue
@@ -78,6 +78,7 @@ if __name__ == '__main__':
     companies_dict = {}
     for company in companies:
         name, data = stock.get_stock_details(company)
-        companies_dict[name] = data
+        if name is not None:
+            companies_dict[name] = data
 
     stock.print(companies_dict)
