@@ -5,7 +5,7 @@ import requests
 from rich.console import Console
 from rich.table import Table
 
-from ipo.gmp import GMPFetcher
+from ipo.gmp_watcher import GMPWatcher
 
 
 class IPOWatcher:
@@ -72,7 +72,7 @@ class IPOWatcher:
 
 if __name__ == '__main__':
     ipo_watcher = IPOWatcher()
-    gmp_fetcher = GMPFetcher()
+    gmp_fetcher = GMPWatcher()
     gmp_data = gmp_fetcher.get_gmp_data()
     ipo_watcher.print_open_listings()
     gmp_fetcher.print_gmp(gmp_data)

@@ -4,7 +4,7 @@ from rich.console import Console
 from rich.table import Table
 
 
-class GMPFetcher:
+class GMPWatcher:
     console = Console()
     url = "https://www.ipowatch.in/p/ipo-grey-market-premium-latest-ipo-grey.html"
 
@@ -41,5 +41,5 @@ class GMPFetcher:
 
 
 if __name__ == '__main__':
-    gmp_fetcher = GMPFetcher()
+    gmp_fetcher = GMPWatcher()
     print(gmp_fetcher.get_gmp_data())
