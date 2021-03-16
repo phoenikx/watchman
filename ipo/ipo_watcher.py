@@ -72,21 +72,12 @@ class IPOWatcher:
         self._print_formatted_output(open_listings)
 
 
-if __name__ == '__main__':
-    ipo_watcher = IPOWatcher()
-    gmp_fetcher = GMPWatcher()
-    gmp_data = gmp_fetcher.get_gmp_data()
-    ipo_watcher.print_open_listings()
-    gmp_fetcher.print_gmp(gmp_data)
-
-
-@click.command
-@click.option("-g", "--gmp")
-@click.option('-s', '--sub')
+@click.command()
+@click.option("--gmp", is_flag=True, help="Include Grey Market Premium")
+@click.option("--sub", is_flag=True, help="Include subscription data")
 def ipo(gmp, sub):
     ipo_watcher = IPOWatcher()
     ipo_watcher.print_open_listings()
-
     if gmp:
         gmp_fetcher = GMPWatcher()
         gmp_data = gmp_fetcher.get_gmp_data()
@@ -95,4 +86,12 @@ def ipo(gmp, sub):
         sub_watcher = SubscriptionWatcher()
         table = sub_watcher.get_subscription_table()
         sub_watcher.print_subscription_table(table)
+
+
+if __name__ == '__main__':
+    ipo()
+
+
+
+
 
