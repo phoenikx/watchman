@@ -1,11 +1,13 @@
 import os
 from datetime import datetime, timedelta
 
+import click
 import requests
 from rich.console import Console
 from rich.table import Table
 
 from ipo.gmp_watcher import GMPWatcher
+from ipo.subscription_watcher import SubscriptionWatcher
 
 
 class IPOWatcher:
@@ -76,3 +78,21 @@ if __name__ == '__main__':
     gmp_data = gmp_fetcher.get_gmp_data()
     ipo_watcher.print_open_listings()
     gmp_fetcher.print_gmp(gmp_data)
+
+
+@click.command
+@click.option("-g", "--gmp")
+@click.option('-s', '--sub')
+def ipo(gmp, sub):
+    ipo_watcher = IPOWatcher()
+    ipo_watcher.print_open_listings()
+
+    if gmp:
+        gmp_fetcher = GMPWatcher()
+        gmp_data = gmp_fetcher.get_gmp_data()
+        gmp_fetcher.print_gmp(gmp_data)
+    if sub:
+        sub_watcher = SubscriptionWatcher()
+        table = sub_watcher.get_subscription_table()
+        sub_watcher.print_subscription_table(table)
+

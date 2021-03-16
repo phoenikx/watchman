@@ -1,0 +1,9 @@
+requests==2.25.1
+rich==9.13.0
+nsepy==0.8
+yahoo-finance==1.4.0
+click==7.1.2
+pyfiglet==0.8.post1
+beautifulsoup4==4.9.3
+fuzzywuzzy==0.18.0
+pyinstaller==4.2
