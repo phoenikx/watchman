@@ -22,8 +22,8 @@ class SubscriptionWatcher:
         color = "red"
         try:
             end_date = datetime.strptime(obj, '%b %d, %Y')
-            if (end_date + timedelta(hours=12) - datetime.now()).total_seconds() > 0:
-                color = "#ffee00"
+            if (end_date + timedelta(hours=16) - datetime.now()).total_seconds() > 0:
+                color = "green"
             return self._add_colour(color, end_date.date())
         except:
             number = float(obj)
