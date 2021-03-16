@@ -73,11 +73,13 @@ class IPOWatcher:
 
 
 @click.command()
+@click.option("--listings", is_flag=True, help="Include Recent Listings")
 @click.option("--gmp", is_flag=True, help="Include Grey Market Premium")
 @click.option("--sub", is_flag=True, help="Include subscription data")
-def ipo(gmp, sub):
-    ipo_watcher = IPOWatcher()
-    ipo_watcher.print_open_listings()
+def ipo(listings, gmp, sub):
+    if listings:
+        ipo_watcher = IPOWatcher()
+        ipo_watcher.print_open_listings()
     if gmp:
         gmp_fetcher = GMPWatcher()
         gmp_data = gmp_fetcher.get_gmp_data()
